@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE-edge">
+        <meta name="viewport" content="width-device-width, initial-scale=1.0">
+        <title>Michael Ly | Airplanes</title>
+
+        <style>
+            html, body {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+            }
+            .sun-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(45deg, rgb(255 219 158), rgb(253 243 220));
+                opacity: 1;
+            }
+            .moon-back {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(313deg, #0b1a2b 33%, #3a6291 111%);
+                opacity: 0;
+            }
+            canvas {
+                position: relative;
+            }
+        </style>
+
+        <script type="module" src="src/index.js"></script>
+    </head>
+
+    <body>
+        <div class="sun-back"></div>
+        <div class="moon-back"></div>
+    </body>
+</html>
