@@ -49,6 +49,12 @@ sunLight.shadow.camera.right = 10;
 scene.add(sunLight);
 
 (async function () {
+    //adding the environment map
+    let pmrem = new PMREMGenerator(renderer);
+    let envmapTexture = await new RGBELoader()
+        .setDataType(FloatType)
+        .loadAsync("assets/drackenstein_quarry_4k.hdr");
+    let envMap = pmrem.fromEquirectangular(envmapTexture).texture;
 
     //adding the earth textures
     let textures = {
@@ -69,8 +75,11 @@ scene.add(sunLight);
             sheenRoughness: 0.75,
             sheenColor: new Color("#ff8a00").convertSRGBToLinear(),
             clearCoat: 0.5,
+            envMap,
+            envmapIntensity: 0.4,
         }),
     );
+    earth.rotation.y += Math.PI * 1.25;
     earth.receiveShadow = true;
     scene.add(earth);
 
