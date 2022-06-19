@@ -48,16 +48,34 @@ sunLight.shadow.camera.top = 10;
 sunLight.shadow.camera.right = 10;
 scene.add(sunLight);
 
-//adding the earth
-let earth = new Mesh(
-    new SphereGeometry(10, 70, 70),
-    new MeshPhysicalMaterial({ }),
-);
-earth.recieveShadow = true;
-scene.add(earth);
-
 (async function () {
+
+    //adding the earth textures
+    let textures = {
+        bump: await new TextureLoader().loadAsync("assets/earthbump.jpg"),
+        map: await new TextureLoader().loadAsync("assets/earthmap.jpg"),
+        spec: await new TextureLoader().loadAsync("assets/earthspec.jpg"),
+    }
+
+    //adding the earth
+    let earth = new Mesh(
+        new SphereGeometry(10, 70, 70),
+        new MeshPhysicalMaterial({
+            map: textures.map,
+            roughnessMap: textures.spec,
+            bumpMap: textures.bump,
+            bumpScale: 0.05,
+            sheen: 1,
+            sheenRoughness: 0.75,
+            sheenColor: new Color("#ff8a00").convertSRGBToLinear(),
+            clearCoat: 0.5,
+        }),
+    );
+    earth.receiveShadow = true;
+    scene.add(earth);
+
     renderer.setAnimationLoop(() => {
+        controls.update();
         renderer.render(scene, camera);
     });
 })();
