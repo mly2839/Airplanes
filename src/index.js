@@ -28,6 +28,12 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
+//adding movement controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0);
+controls.dampingFactor = 0.05;
+controls.enableDamping = true;
+
 //adding sunlight
 const sunLight = new DirectionalLight( new Color("#FFFFFF"), 3.5);
 sunLight.position.set(10, 20, 10);
