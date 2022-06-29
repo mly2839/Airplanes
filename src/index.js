@@ -61,7 +61,19 @@ scene.add(sunLight);
         bump: await new TextureLoader().loadAsync("assets/earthbump.jpg"),
         map: await new TextureLoader().loadAsync("assets/earthmap.jpg"),
         spec: await new TextureLoader().loadAsync("assets/earthspec.jpg"),
+        trail: await new TextureLoader().loadAsync("assets/mask.png"),
     }
+
+    //adding the planes
+    let plane = (await new GLTFLoader().loadAsync("assets/plane/scene.glb")).scene.children[0];
+    let planesData = [
+        makePlane(plane, textures.trail, envMap, scene),
+        makePlane(plane, textures.trail, envMap, scene),
+        makePlane(plane, textures.trail, envMap, scene),
+        makePlane(plane, textures.trail, envMap, scene),
+        makePlane(plane, textures.trail, envMap, scene),
+        makePlane(plane, textures.trail, envMap, scene),
+    ];
 
     //adding the earth
     let earth = new Mesh(
@@ -82,9 +94,64 @@ scene.add(sunLight);
     earth.rotation.y += Math.PI * 1.25;
     earth.receiveShadow = true;
     scene.add(earth);
-
+    
+    //adding a clock
+    let clock = new Clock();
+    
+    //the animation renderer
     renderer.setAnimationLoop(() => {
+        let delta = clock.getDelta();
+
+        planesData.forEach(planeData => {
+            let plane = planeData.group;
+
+            plane.position.set(0,0,0);
+            plane.rotation.set(0,0,0);
+            plane.updateMatrixWorld();
+            
+            planeData.rot += delta * 0.25;
+            plane.rotateOnAxis(planeData.randomAxis, planeData.randomAxisRot);
+            plane.rotateOnAxis(new Vector3(0,1,0), planeData.rot);
+            plane.rotateOnAxis(new Vector3(0,0,1), planeData.rad);
+            plane.translateY(planeData.yOff);
+            plane.rotateOnAxis(new Vector3(1,0,0), +Math.PI * 0.5);
+        });
+
         controls.update();
         renderer.render(scene, camera);
     });
 })();
+
+//function to create plane and add properties to it
+function makePlane(planeMesh, trail, envMap, scene) {
+    let plane = planeMesh.clone();
+    plane.scale.set(0.001,0.001,0.001);
+    plane.position.set(0,0,0);
+    plane.rotation.set(0,0,0);
+
+    plane.traverse((object) => {
+        if(object instanceof Mesh) {
+            object.material.envMap = envMap;
+            object.castShadow = true;
+            object.receiveShadow = true;
+        }
+    });
+
+    let group = new Group();
+    group.add(plane);
+
+    scene.add(group);
+
+    return {
+        group,
+        yOff: 10.5 + Math.random() * 1.0,
+        rot: Math.random() * Math.PI * 2.0,
+        rad: Math.random() * Math.PI * 0.45 + 0.2,
+        randomAxis: new Vector3(randomNumber(), randomNumber(), randomNumber()).normalize(),
+        randomAxisRot: Math.random() * Math.PI * 2,
+    }
+}
+
+function randomNumber() {
+    return Math.random() * 2 - 1;
+}
