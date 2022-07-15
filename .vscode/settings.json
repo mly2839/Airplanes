@@ -3,6 +3,7 @@
         "envmap",
         "Equirectangular",
         "GLTF",
+        "metalness",
         "pmrem",
         "RGBE"
     ]
