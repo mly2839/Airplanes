@@ -55,6 +55,17 @@ sunLight.shadow.camera.top = 10;
 sunLight.shadow.camera.right = 10;
 scene.add(sunLight);
 
+//adding mouse tracking 
+let mousePos = new Vector2(0, 0);
+
+window.addEventListener("mousemove", (e) => {
+    let x = e.clientX - innerWidth * 0.5;
+    let y = e.clientY - innerHeight * 0.5;
+
+    mousePos.x = x * 0.0003;
+    mousePos.y = y * 0.0003;
+});
+
 (async function () {
     //adding the environment map
     let pmrem = new PMREMGenerator(renderer);
@@ -82,6 +93,8 @@ scene.add(sunLight);
         new RingGeometry(16.5, 15.75, 80, 1, 0),
         new MeshPhysicalMaterial({
             color: new Color("#FFCB8E").convertSRGBToLinear(),
+            envMap,
+            envmapIntensity: 0.5,
             side: DoubleSide,
             transparent: true,
             opacity: 0.5,
@@ -93,6 +106,8 @@ scene.add(sunLight);
         new RingGeometry(18, 17.75, 80),
         new MeshPhysicalMaterial({
             color: new Color("#FFCB8E").convertSRGBToLinear().multiplyScalar(50),
+            envMap,
+            envmapIntensity: 1.8,
             side: DoubleSide,
             transparent: true,
             opacity: 0.5,
@@ -164,6 +179,15 @@ scene.add(sunLight);
 
         controls.update();
         renderer.render(scene, camera);
+
+        ring1.rotation.x = ring1.rotation.x * 0.95 + mousePos.y * 0.05 * 1.2;
+        ring1.rotation.y = ring1.rotation.y * 0.95 + mousePos.x * 0.05 * 1.2;
+
+        ring2.rotation.x = ring2.rotation.x * 0.95 + mousePos.y * 0.05 * 0.38;
+        ring2.rotation.y = ring2.rotation.y * 0.95 + mousePos.x * 0.05 * 0.38;
+
+        ring3.rotation.x = ring3.rotation.x * 0.95 - mousePos.y * 0.05 * 0.28;
+        ring3.rotation.y = ring3.rotation.y * 0.95 - mousePos.x * 0.05 * 0.28;
 
         renderer.autoClear = false;
         renderer.render(ringScene, ringCamera);
