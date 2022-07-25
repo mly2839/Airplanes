@@ -11,6 +11,10 @@ import { OrbitControls } from "https://cdn.skypack.dev/three-stdlib@2.8.5/contro
 import { GLTFLoader } from "https://cdn.skypack.dev/three-stdlib@2.8.5/loaders/GLTFLoader";
 import anime from 'https://cdn.skypack.dev/animejs@3.2.1';
 
+// the css backgrounds
+let sunBack = document.querySelector(".sun-back");
+let moonBack = document.querySelector(".moon-back");
+
 //adding scene
 const scene = new Scene();
 
@@ -101,6 +105,8 @@ window.addEventListener("mousemove", (e) => {
             opacity: 0.35,
         })
     )
+    ring1.sunOpacity = 0.35;
+    ring1.moonOpacity = 0.03;
     ringScene.add(ring1);
 
     const ring2 = new Mesh(
@@ -114,6 +120,8 @@ window.addEventListener("mousemove", (e) => {
             opacity: 0.5,
         })
     )
+    ring2.sunOpacity = 0.35;
+    ring2.moonOpacity = 0.1;
     ringScene.add(ring2);
 
     const ring3 = new Mesh(
@@ -127,6 +135,8 @@ window.addEventListener("mousemove", (e) => {
             opacity: 0.5,
         })
     )
+    ring3.sunOpacity = 0.35;
+    ring3.moonOpacity = 0.03;
     ringScene.add(ring3);
 
 
@@ -165,6 +175,8 @@ window.addEventListener("mousemove", (e) => {
             envmapIntensity: 0.4,
         }),
     );
+    earth.sunEnvIntensity = 0.4;
+    earth.moonEnvIntensity = 0.4;
     earth.rotation.y += Math.PI * 1.25;
     earth.receiveShadow = true;
     scene.add(earth);
@@ -172,6 +184,56 @@ window.addEventListener("mousemove", (e) => {
     //adding a clock
     let clock = new Clock();
     
+    // event listener for changing from sun to moon and back
+    let daytime = true;
+    let animating = false;
+    window.addEventListener("mousemove", (e) => {
+
+        if (animating) { return; }
+
+        // changes the values to go from so we can switch back and forth
+        let anim;
+        if (e.clientX > (innerWidth - 200) && !daytime) {
+            anim = [1, 0];
+        } else if (e.clintX < 200 && daytime) {
+            anim = [0, 1];
+        } else { return; }
+
+        animating = true;
+
+        let obj = { t: 0 };
+        anime({
+            targets: obj,
+            t: anim,
+            complete: () => {
+                animating = false;
+                daytime = !daytime;
+            },
+            update: () => {
+                sunLight.intensity = 3.5 * (1-obj.t);
+                moonLight.intensity = 3.5 * obj.t;
+
+                sunLight.position.setY(20 * (1-obj.t));
+                moonLight.position.setY(20 * obj.t);
+
+                earth.material.sheen = (1-obj.t);
+
+                scene.children.forEach((child) => {
+                    child.traverse((object) => {
+                        if(object instanceof Mesh && object.material.envMap) {
+                            object.material.envmapIntensity = object.sunEnvIntensity * (1-obj.t) + object.moonEnvIntensity * obj.t;
+                        }
+                    });
+                });
+
+                sunBack.style.opacity = 1 - obj.t;
+                moonBack.style.opacity = obj.t;
+            },
+            easing: "easeInOutSine",
+            duration: 500,
+        });
+    });
+
     //the animation renderer
     renderer.setAnimationLoop(() => {
         let delta = clock.getDelta();
@@ -220,6 +282,8 @@ function makePlane(planeMesh, trailT, envMap, scene) {
     plane.traverse((object) => {
         if(object instanceof Mesh) {
             object.material.envMap = envMap;
+            object.sunEnvIntensity = 1;
+            object.moonEnvIntensity = 0.3;
             object.castShadow = true;
             object.receiveShadow = true;
         }
@@ -239,6 +303,8 @@ function makePlane(planeMesh, trailT, envMap, scene) {
             alphaMap: trailT,
         })
     )
+    trail.sunEnvIntensity = 3;
+    trail.moonEnvIntensity = 0.7;
     trail.rotateX(Math.PI);
     trail.translateY(1.1);
 
