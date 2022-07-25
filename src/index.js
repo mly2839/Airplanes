@@ -55,6 +55,20 @@ sunLight.shadow.camera.top = 10;
 sunLight.shadow.camera.right = 10;
 scene.add(sunLight);
 
+//adding moonlight
+const moonLight = new DirectionalLight( new Color("#77ccff"), 0);
+moonLight.position.set(-10, 20, 10);
+moonLight.castShadow = true;
+moonLight.shadow.mapSize.width = 512;
+moonLight.shadow.mapSize.height = 512;
+moonLight.shadow.camera.near = 0.5;
+moonLight.shadow.camera.far = 100;
+moonLight.shadow.camera.left = -10;
+moonLight.shadow.camera.bottom = -10;
+moonLight.shadow.camera.top = 10;
+moonLight.shadow.camera.right = 10;
+scene.add(moonLight);
+
 //adding mouse tracking 
 let mousePos = new Vector2(0, 0);
 
